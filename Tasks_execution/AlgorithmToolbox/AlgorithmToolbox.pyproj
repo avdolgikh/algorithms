@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>0c250532-a17a-44d3-9004-9169108c70e4</ProjectGuid>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>AlgorithmToolbox</Name>
+    <RootNamespace>DataPreparation</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="w2_fibinacci_sum.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w2_huge_fibonacci.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w1_aplusb.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w2_fibonacci.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w1_max_pairwise_product.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w2_fibonacci_last_digit.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w2_gcd.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w2_lcm.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w3_change.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w3_dot_product.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w3_fractional_knapsack.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w6_parentheses.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w6_partition3.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w4_binary_search.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w4_majority_element.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w4_sorting.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w5_change_dp.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w5_edit_distance.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w5_primitive_calculator.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="w6_knapsac.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <Import Condition="Exists($(PtvsTargetsFile))" Project="$(PtvsTargetsFile)" />
+  <Import Condition="!Exists($(PtvsTargetsFile))" Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

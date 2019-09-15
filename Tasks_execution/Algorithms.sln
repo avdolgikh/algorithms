@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "AlgorithmToolbox", "AlgorithmToolbox\AlgorithmToolbox.pyproj", "{0C250532-A17A-44D3-9004-9169108C70E4}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DataStructures", "DataStructures\DataStructures.pyproj", "{47CB5D39-AB5E-4E36-BDD8-4804BFC3D521}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "LeetCode", "LeetCode\LeetCode.pyproj", "{28F4478D-DB7B-4A40-92E2-A960FB0835A6}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "GraphAlgorithm", "GraphAlgorithm\GraphAlgorithm.pyproj", "{2DB913DA-C79C-4631-AE24-15E65CC29B05}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C250532-A17A-44D3-9004-9169108C70E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C250532-A17A-44D3-9004-9169108C70E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47CB5D39-AB5E-4E36-BDD8-4804BFC3D521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47CB5D39-AB5E-4E36-BDD8-4804BFC3D521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28F4478D-DB7B-4A40-92E2-A960FB0835A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28F4478D-DB7B-4A40-92E2-A960FB0835A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DB913DA-C79C-4631-AE24-15E65CC29B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB913DA-C79C-4631-AE24-15E65CC29B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
