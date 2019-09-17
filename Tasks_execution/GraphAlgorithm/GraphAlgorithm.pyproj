@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2db913da-c79c-4631-ae24-15e65cc29b05</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>w6_dist_with_coords.py</StartupFile>
+    <StartupFile>w6_dist_preprocess_small.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -52,6 +52,9 @@
     </Compile>
     <Compile Include="w5_clustering.py" />
     <Compile Include="w5_connecting_points.py" />
+    <Compile Include="w6_dist_preprocess_small.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="w6_dist_with_coords.py">
       <SubType>Code</SubType>
     </Compile>
