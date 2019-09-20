@@ -106,7 +106,7 @@ class ContractionHierarchiesPreprocessor:
     def conract(self, v):
         self.witness_search(v)
 
-        for neighbor in self.adj[1][v] + self.adj[0][v]:
+        for neighbor in (self.adj[1][v] + self.adj[0][v]):
             self.level[neighbor] = max( self.level[neighbor], self.level[v] + 1 )
 
     def witness_search(self, v, add_shortcuts=True):
@@ -143,8 +143,8 @@ class ContractionHierarchiesPreprocessor:
 
     def add_shortcut(self, u, v, c):
 
-        if self.contracted[v]:
-            return
+        #if self.contracted[v]:
+        #    return
 
         def update(adj, cost, u, v, c):
             for i in range(len(adj[u])):
@@ -165,16 +165,16 @@ class ContractionHierarchiesPreprocessor:
         shortcut_count = self.witness_search(v, add_shortcuts = False)
         # heuristic: shortcut_count = len(self.adj[0][v]) * len(self.adj[1][v])
         # shortcut_count - number of added shortcuts s(v); how many shortcuts would be added if we contract this node v.
-        edge_difference = shortcut_count - len(self.adj[0][v]) - len(self.adj[1][v])        
+        edge_difference = shortcut_count - len(self.adj[0][v]) - len(self.adj[1][v])
         #edge_difference = 0
         
         n_contracted_neighbors = 0 # number of contracted neighbors
         shortcut_cover = 0 # number of neighbors that we HAVE TO short cut...
 
-        for neighbor in self.adj[1][v] + self.adj[0][v]:
+        for neighbor in (self.adj[1][v] + self.adj[0][v]):
             if self.contracted[neighbor]:
                 n_contracted_neighbors += 1
-            if len(self.adj[1][neighbor] + self.adj[0][neighbor]) == 1:
+            if len(self.adj[1][neighbor] + self.adj[0][neighbor]) == 1: # ! or < 3 !? it can be 2: one in, one out; so it is important...
                 shortcut_cover += 1
         
         importance = edge_difference + n_contracted_neighbors + shortcut_cover + self.level[v] # add weights
@@ -219,17 +219,16 @@ class ContractionHierarchies:
                 if self.bidistance[side][v] <= self.estimate:
                     for u_i in range(len(self.adj[side][v])):
                         u = self.adj[side][v][u_i]
-                        if self.rank[u] > self.rank[v]:
-                            self.relax(q, side, u, self.bidistance[side][v] + self.cost[side][v][u_i])
+                        #if self.rank[u] > self.rank[v]:
+                        self.relax(q, side, u, self.bidistance[side][v] + self.cost[side][v][u_i])
 
-                if self.visited[int(not bool(1))][v] and (self.bidistance[0][v] + self.bidistance[1][v]) < self.estimate:
+                inverted_side = int(not bool(side))
+                if self.visited[inverted_side][v] and (self.bidistance[0][v] + self.bidistance[1][v]) < self.estimate:
                     self.estimate = self.bidistance[0][v] + self.bidistance[1][v]
 
-
-    # Returns the distance from s to t in the graph
     def query(self, s, t):
         self.clear()
-        q = [queue.PriorityQueue(), queue.PriorityQueue()]        
+        q = [queue.PriorityQueue(), queue.PriorityQueue()]
         self.relax(q, 0, s, 0)
         self.relax(q, 1, t, 0)
 
@@ -317,6 +316,29 @@ Your output:
 
 Correct output:
 3081
+!!! 986
+-1
+926
+347
+-1
+156
+926
+1018
+589
+
+------
+3081
+986
+-1
+926
+347
+-1
+156
+926
+1018
+589
+----
+3081
 986
 -1
 926
@@ -328,4 +350,12 @@ Correct output:
 589
 
  (Time used: 0.00/10.00, preprocess time used: 0.02/50.0, memory used: 0/2147483648.)
+"""
+
+
+"""
+Failed case #4/6: Wrong answer
+
+ (Time used: 0.43/10.00, preprocess time used: 6.29/50.0, memory used: 0/2147483648.)
+
 """
