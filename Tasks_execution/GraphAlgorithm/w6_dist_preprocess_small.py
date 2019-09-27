@@ -11,7 +11,7 @@ import queue
 maxlen = 2 * 10**6
 
 
-def dijkstra(adj, cost, s, max_edges, ignore_v, dist_limit):
+def dijkstra(adj, cost, s, max_edges, ignore_v, dist_limit, contracted):
     n = len(adj)
     visited = [False] * n
     dist = [maxlen] * n
@@ -29,14 +29,14 @@ def dijkstra(adj, cost, s, max_edges, ignore_v, dist_limit):
 
         if not visited[u]:
             visited[u] = True
-
-            edges_count += 1
+            
             if edges_count >= max_edges:
                 return dist
+            edges_count += 1
 
             for v_i in range(len(adj[u])):
                 v = adj[u][v_i]
-                if v != ignore_v:
+                if v != ignore_v and not contracted[v]:
                     if dist[v] > dist[u] + cost[u][v_i]:
                         dist[v] = dist[u] + cost[u][v_i]
                         q.put((dist[v], v))
@@ -64,25 +64,25 @@ class ContractionHierarchiesPreprocessor:
         # At the end: new edges (augmentation), rank (and level) array is filled out.
         for v in range(self.n):
             self.q.put((-self.INFINITY, v))
-
+        
         while not self.q.empty():
             v = self.q.get()[1]
-
+        
             if not self.contracted[v]:
                 importance = self.recompute_importance(v)
             
-                if self.q.empty() or importance <= self.q.queue[0][0]: # or strong "<" ? # q.queue[0][0] means q.head()
-                    self.conract(v)
-
+                if self.q.empty() or importance <= sorted([ item[0] for item in self.q.queue ])[0]:
+                    self.contract(v)
+        
                     # self.rank[v] is a position in node order (returned by the preprocessing stage)
                     self.rank[v] = self.max_rank
                     self.max_rank += 1                    
                     self.contracted[v] = True
-
+        
                 else:            
                     self.q.put((importance, v))
-
-        self.remove_going_down_edges() # TODO: make this deletion during contracting stage!
+        
+        #self.remove_going_down_edges()
 
     def remove_going_down_edges(self):
         # go through WHOLE graph and delete (u, v) if self.rank[u] > self.rank[v]
@@ -93,7 +93,7 @@ class ContractionHierarchiesPreprocessor:
                 cost = []
                 for v_i in range(len(self.adj[side][u])):
                     v = self.adj[side][u][v_i]
-                    if self.rank[u] <= self.rank[v]:
+                    if self.rank[u] < self.rank[v]:
                         adj.append(v)
                         cost.append(self.cost[side][u][v_i])
                 self.adj[side][u] = adj
@@ -102,11 +102,12 @@ class ContractionHierarchiesPreprocessor:
         for side in [0, 1]:
             remove_going_down_edges(side)
 
-    def conract(self, v):
+    def contract(self, v):
         self.witness_search(v)
 
         for neighbor in (self.adj[1][v] + self.adj[0][v]):
-            self.level[neighbor] = max( self.level[neighbor], self.level[v] + 1 )
+            if not self.contracted[neighbor]:
+                self.level[neighbor] = max( self.level[neighbor], self.level[v] + 1 )
 
     def witness_search(self, v, add_shortcuts=True):
         # Witness Paths https://www.coursera.org/learn/algorithms-on-graphs/lecture/AWFGa/preprocessing, 4:44
@@ -116,36 +117,43 @@ class ContractionHierarchiesPreprocessor:
             # if d(ui, x) > max max [ l(u,v) + l(v,w) - l(w', w) ]    
             #    or k edges are processed (increase k from 1 to 5 ???)
 
-        #max_successor_dist = max(self.cost[0][v])
+        #max_successor_dist = max(self.cost[0][v]) if len(self.cost[0][v]) > 0 else 0
         dist_limit = ( max(self.cost[1][v]) if len(self.cost[1][v]) > 0 else 0 ) + ( max(self.cost[0][v]) if len(self.cost[0][v]) > 0 else 0 )
 
         shortcut_count = 0
+        shortcut_nodes = set()
 
         for u_i in range(len(self.adj[1][v])): # predecessors of v
             u = self.adj[1][v][u_i]
 
-            l_u_v = self.cost[1][v][u_i]
+            if self.contracted[u]:
+                continue
 
+            l_u_v = self.cost[1][v][u_i]
             #dist_limit = l_u_v + max_successor_dist
 
-            dist = dijkstra(self.adj[0], self.cost[0], u, 10 * len(self.adj[0][v]), v, dist_limit)
+            dist = dijkstra(self.adj[0], self.cost[0], u, 100, v, dist_limit, self.contracted)
 
             for w_i in range(len(self.adj[0][v])): # successors of v.
                 w = self.adj[0][v][w_i]
+
+                if self.contracted[w]:
+                    continue
+
                 l_v_w = self.cost[0][v][w_i]
                 c = l_u_v + l_v_w
                 if dist[w] > c:
                     shortcut_count += 1
+                    shortcut_nodes.add(u)
+                    shortcut_nodes.add(w)
                     if add_shortcuts:
                         self.add_shortcut(u, w, c)
+
+        shortcut_cover = len(shortcut_nodes)
                         
-        return shortcut_count
+        return shortcut_count, shortcut_cover
 
     def add_shortcut(self, u, v, c):
-
-        #if self.contracted[v]:
-        #    return
-
         def update(adj, cost, u, v, c):
             for i in range(len(adj[u])):
                 if adj[u][i] == v:
@@ -162,22 +170,22 @@ class ContractionHierarchiesPreprocessor:
 
         # EACH of the 4 quantities is necessary!!!
         
-        #shortcut_count = self.witness_search(v, add_shortcuts = False)
-        # heuristic: shortcut_count = len(self.adj[0][v]) * len(self.adj[1][v])
+        shortcut_count, shortcut_cover = self.witness_search(v, add_shortcuts = False)
         # shortcut_count - number of added shortcuts s(v); how many shortcuts would be added if we contract this node v.
-        #edge_difference = shortcut_count - len(self.adj[0][v]) - len(self.adj[1][v])
-        edge_difference = len(self.adj[0][v]) * len(self.adj[1][v]) - len(self.adj[0][v]) - len(self.adj[1][v])
+        # shortcut_cover - number of neighbors that we HAVE TO short cut...
+        
+        neighbors = self.adj[1][v] + self.adj[0][v]
                 
-        n_contracted_neighbors = 0 # number of contracted neighbors
-        shortcut_cover = 0 # number of neighbors that we HAVE TO short cut...
-
-        for neighbor in (self.adj[1][v] + self.adj[0][v]):
+        n_contracted_neighbors = 0
+        
+        for neighbor in neighbors:
             if self.contracted[neighbor]:
                 n_contracted_neighbors += 1
-            if len(self.adj[1][neighbor] + self.adj[0][neighbor]) < 3: # ! or < 3 !? it can be 2: one in, one out; so it is important...
-                shortcut_cover += 1
+
+        edge_difference = shortcut_count - (len(neighbors) - n_contracted_neighbors)
         
         importance = edge_difference + n_contracted_neighbors + shortcut_cover + self.level[v] # add weights
+        #importance = 14 * edge_difference + 25 * shortcut_cover + 10 * self.level[v]
 
         return importance
 
@@ -196,6 +204,7 @@ class ContractionHierarchies:
 
         preprocessor = ContractionHierarchiesPreprocessor(n, self.adj, self.cost, self.rank)
         preprocessor.prepocess()
+        #self.rank = list(range(n))
     
     def clear(self):
         self.bidistance = [[self.INFINITY] * n, [self.INFINITY] * n]
@@ -218,8 +227,8 @@ class ContractionHierarchies:
                 if self.bidistance[side][v] <= self.estimate:
                     for u_i in range(len(self.adj[side][v])):
                         u = self.adj[side][v][u_i]
-                        #if self.rank[u] > self.rank[v]:
-                        self.relax(q, side, u, self.bidistance[side][v] + self.cost[side][v][u_i])
+                        if self.rank[u] > self.rank[v]:
+                            self.relax(q, side, u, self.bidistance[side][v] + self.cost[side][v][u_i])
 
                 inverted_side = int(not bool(side))
                 if self.visited[inverted_side][v] and (self.bidistance[0][v] + self.bidistance[1][v]) < self.estimate:
@@ -227,7 +236,7 @@ class ContractionHierarchies:
 
     def query(self, s, t):
         self.clear()
-        q = [queue.PriorityQueue(), queue.PriorityQueue()]
+        q = [ queue.PriorityQueue(), queue.PriorityQueue() ]
         self.relax(q, 0, s, 0)
         self.relax(q, 1, t, 0)
 
@@ -322,4 +331,9 @@ Correct output:
 """
 Failed case #4/6: Wrong answer
 (Time used: 0.34/10.00,  preprocess time used: 5.98/50.0, memory used: 0/2147483648.)
+"""
+
+"""
+without preprocessing
+Failed case #6/6: time limit exceeded (Time used: 86.09/10.00, preprocess time used: 0.07/50.0, memory used: 0/2147483648.)
 """
