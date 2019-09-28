@@ -132,7 +132,7 @@ class ContractionHierarchiesPreprocessor:
             l_u_v = self.cost[1][v][u_i]
             #dist_limit = l_u_v + max_successor_dist
 
-            dist = dijkstra(self.adj[0], self.cost[0], u, 100, v, dist_limit, self.contracted)
+            dist = dijkstra(self.adj[0], self.cost[0], u, 5, v, dist_limit, self.contracted)
 
             for w_i in range(len(self.adj[0][v])): # successors of v.
                 w = self.adj[0][v][w_i]
@@ -204,7 +204,6 @@ class ContractionHierarchies:
 
         preprocessor = ContractionHierarchiesPreprocessor(n, self.adj, self.cost, self.rank)
         preprocessor.prepocess()
-        #self.rank = list(range(n))
     
     def clear(self):
         self.bidistance = [[self.INFINITY] * n, [self.INFINITY] * n]
