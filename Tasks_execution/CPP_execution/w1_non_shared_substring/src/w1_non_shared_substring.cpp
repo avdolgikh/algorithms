@@ -115,22 +115,70 @@ SuffixTree BuildSuffixTree(const string& text) {
 vector<string> ComputeSuffixTreeEdges(const string& text) {
   vector<string> result;
   SuffixTree tree = BuildSuffixTree(text);
-  //PrintSuffixTree(tree, text);
-  for (const Node& node : tree) {
-	  if (node.length > 0) {
-		string suffix = text.substr(node.startPosition, node.length);
-		result.push_back( suffix );
-	  }
-  }
+  PrintSuffixTree(tree, text);
+//  for (const Node& node : tree) {
+//	  if (node.length > 0) {
+//		string suffix = text.substr(node.startPosition, node.length);
+//		result.push_back( suffix );
+//	  }
+//  }
   return result;
 }
 
-int main() {
-  string text = "panamabananas$"; //"panamabananas$"; //"ATAAATG$"; //"ACA$"; //"A$";
-  //cin >> text;
-  vector<string> edges = ComputeSuffixTreeEdges(text);
-  for (int i = 0; i < (int) edges.size(); ++i) {
-    cout << edges[i] << endl;
-  }
-  return 0;
+void Traverse(const SuffixTree& tree, int currentNodeIndex, const string& text) {
+	Node node = tree[currentNodeIndex];
+	if (node.length > 0) {
+		cout << text.substr(node.startPosition, node.length) << endl;
+		// concat all paths
+	}
+	if (tree[currentNodeIndex].next.size() > 0) {
+		for (int i = 0; i < tree[currentNodeIndex].next.size(); ++i) {
+			Traverse(tree, tree[currentNodeIndex].next[i], text);
+		}
+	} else {
+		// if children are leaves with '#' and and WITHOUT '#'
+		// => this NODE is node of splitting
+		// Find shortest path before '#'
+	}
 }
+
+
+string solve (string p, string q)
+{
+	string result = p;
+
+	string text = p + '#' + q + '$';
+	cout << text << endl << endl;
+
+	SuffixTree tree = BuildSuffixTree(text);
+
+	Traverse(tree, 0, text);
+
+	return result;
+}
+
+
+
+
+int main (void)
+{
+	string p = "AAAA"; // "AA"; // "A"; // "AAA"; // "AAT"; // "ATAATT";
+	//cin >> p;
+	string q = "TTTT"; // "AT"; // "T"; // "TAA"; // "AT"; // "ATT";
+	//cin >> q;
+
+	//string text = p + '#' + q + '$';
+	//cout << text << endl << endl;
+
+	//vector<string> edges = ComputeSuffixTreeEdges( text );
+
+//	for (int i = 0; i < (int) edges.size(); ++i) {
+//		cout << edges[i] << endl;
+//	}
+
+	string ans = solve(p, q);
+	//cout << ans << endl;
+
+	return 0;
+}
+
