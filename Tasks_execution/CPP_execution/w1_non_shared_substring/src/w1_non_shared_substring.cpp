@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <queue>
 
 using namespace std;
 
@@ -14,6 +15,13 @@ struct Node
 	vector<int> next;
 	int startPosition = -1;
 	int length = 0;
+	string pathText = "";
+	int notFromSecondText = 1;
+};
+
+struct ShortestSubstringContainer
+{
+	string substring = "";
 };
 
 typedef vector<Node> SuffixTree;
@@ -112,72 +120,105 @@ SuffixTree BuildSuffixTree(const string& text) {
 	return tree;
 }
 
-vector<string> ComputeSuffixTreeEdges(const string& text) {
-  vector<string> result;
-  SuffixTree tree = BuildSuffixTree(text);
-  PrintSuffixTree(tree, text);
-//  for (const Node& node : tree) {
-//	  if (node.length > 0) {
-//		string suffix = text.substr(node.startPosition, node.length);
-//		result.push_back( suffix );
-//	  }
-//  }
-  return result;
-}
+// https://stackoverflow.com/questions/12607512/shortest-uncommon-substring-shortest-substring-of-one-string-that-is-not-a-sub
+string TraverseBFS(const SuffixTree& tree, const string& text) {
+	queue<Node> q;
+	q.push(tree[0]);
+	string backup = text.substr(0, 1);
 
-void Traverse(const SuffixTree& tree, int currentNodeIndex, const string& text) {
-	Node node = tree[currentNodeIndex];
-	if (node.length > 0) {
-		cout << text.substr(node.startPosition, node.length) << endl;
-		// concat all paths
-	}
-	if (tree[currentNodeIndex].next.size() > 0) {
-		for (int i = 0; i < tree[currentNodeIndex].next.size(); ++i) {
-			Traverse(tree, tree[currentNodeIndex].next[i], text);
+	while (!q.empty()) {
+		Node node = q.front();
+		q.pop();
+
+		string currentNodeSuffix = "";
+		if (node.length > 0) {
+			currentNodeSuffix = text.substr(node.startPosition, node.length);
 		}
-	} else {
-		// if children are leaves with '#' and and WITHOUT '#'
-		// => this NODE is node of splitting
-		// Find shortest path before '#'
+		cout << "Current node suffix: " << currentNodeSuffix << endl;
+		cout << "Parent path: " << node.pathText << endl;
+
+		if ( (int) currentNodeSuffix.find("#") > 0 ) {
+			cout << "Answer 1: " << node.pathText + currentNodeSuffix.substr(0, 1) << endl;
+			return node.pathText + currentNodeSuffix.substr(0, 1);
+		}
+
+		if (node.next.size() > 0) {
+			bool text2Leaf = false;
+			bool someLeaves = false;
+			for (int index : node.next) {
+				Node childNode = tree[index];
+				childNode.pathText = node.pathText + currentNodeSuffix;
+				q.push(childNode);
+				string childText = text.substr(childNode.startPosition, childNode.length);
+
+				if ( ((int) childText.find("$") > -1) && ((int) childText.find("#") == -1)  ) {
+					text2Leaf = true;
+				}
+
+				if ((int) childText.find("$") > -1) {
+					someLeaves = true;
+				}
+			}
+
+//			if (someLeaves && !text2Leaf) {
+//				cout << "Answer 2: " << node.pathText + currentNodeSuffix << endl;
+//				return node.pathText + currentNodeSuffix;
+//			}
+		}
 	}
+
+	cout << "Backup: " << backup << endl;
+	return backup;
 }
 
+// https://github.com/barik111/Data-Structures-and-Algorithms-Specialization/blob/master/Data_Structures_and_Algorithms/Algorithms_on_Strings/Programming-Assignment-1/non_shared_substring/NonSharedSubstring.java
+int TraverseDFS(int currentNodeIndex, const SuffixTree& tree, const string& text, int textsDelimiterPosition, string pathText, ShortestSubstringContainer& container) {
+	Node node = tree[currentNodeIndex];
+	if (node.next.size() == 0) {
+		// it is a leaf.
+		node.notFromSecondText = node.startPosition < textsDelimiterPosition + 1 ? 1 : 0;
+	} else {
+		for (int index : node.next) {
+			string currentNodeSuffix = "";
+			if (node.length > 0) {
+				currentNodeSuffix = text.substr(node.startPosition, node.length);
+			}
+			node.notFromSecondText *= TraverseDFS(index, tree, text, textsDelimiterPosition, pathText + currentNodeSuffix, container);
+		}
+	}
+
+	if (node.notFromSecondText == 1) {
+		node.pathText = pathText;
+
+		if (node.startPosition < textsDelimiterPosition) {
+			node.pathText += text.substr(node.startPosition, 1);
+			container.substring = node.pathText;
+		}
+	}
+	return node.notFromSecondText;
+}
 
 string solve (string p, string q)
 {
 	string result = p;
-
 	string text = p + '#' + q + '$';
-	cout << text << endl << endl;
-
+	//cout << text << endl << endl;
 	SuffixTree tree = BuildSuffixTree(text);
-
-	Traverse(tree, 0, text);
-
-	return result;
+	//PrintSuffixTree(tree, text);
+	ShortestSubstringContainer container;
+	TraverseDFS(0, tree, text, p.length(), "", container);
+	return container.substring;
 }
-
-
-
 
 int main (void)
 {
-	string p = "AAAA"; // "AA"; // "A"; // "AAA"; // "AAT"; // "ATAATT";
-	//cin >> p;
-	string q = "TTTT"; // "AT"; // "T"; // "TAA"; // "AT"; // "ATT";
-	//cin >> q;
-
-	//string text = p + '#' + q + '$';
-	//cout << text << endl << endl;
-
-	//vector<string> edges = ComputeSuffixTreeEdges( text );
-
-//	for (int i = 0; i < (int) edges.size(); ++i) {
-//		cout << edges[i] << endl;
-//	}
+	string p; // = "ATGCGATGACCTGACTGA"; // "AAAAAAAAAAAAAAAAAAAA"; // "ATGCGATGACCTGACTGA"; // "CCAAGC"; // "CCAAGCTGCTAGAGG"; // "AT"; // "AAAA"; // "AA"; // "A"; // "AAA"; // "AAT"; // "ATAATT";
+	cin >> p;
+	string q; // = "CTCAACGTATTGGCCAGA"; // "TTTTTTTTTTTTTTTTTTTT"; // "CTCAACGTATTGGCCAGA"; // "CATGCT"; // "CATGCTGGGCTGGCT"; // "TT"; // "TTTT"; // "AT"; // "T"; // "TAA"; // "AT"; // "ATT";
+	cin >> q;
 
 	string ans = solve(p, q);
-	//cout << ans << endl;
+	cout << ans << endl;
 
 	return 0;
 }
