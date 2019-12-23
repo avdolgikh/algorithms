@@ -192,7 +192,9 @@ int TraverseDFS(int currentNodeIndex, const SuffixTree& tree, const string& text
 
 		if (node.startPosition < textsDelimiterPosition) {
 			node.pathText += text.substr(node.startPosition, 1);
-			container.substring = node.pathText;
+			if (container.substring.length() == 0 || container.substring.length() > node.pathText.length()) {
+				container.substring = node.pathText;
+			}
 		}
 	}
 	return node.notFromSecondText;
