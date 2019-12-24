@@ -15,7 +15,7 @@ public:
 		string bwt = "";
 		for (const auto& item : items) {
 			char s = text[ item.GetLastSymbolIndex() ];
-			cout << s << endl;
+			//cout << s << endl;
 			bwt.push_back(s);
 		}
 		return bwt;
@@ -39,7 +39,7 @@ private:
 			return Rotate(text, firstSymbolInd) < Rotate(text, obj.firstSymbolInd);
 		}
 
-		char GetLastSymbolIndex() const {
+		int GetLastSymbolIndex() const {
 			return lastSymbolInd;
 		}
 
@@ -66,15 +66,15 @@ int main() {
 	string text = "AGACATA";
 	//cin >> text;
 
-	for (int i = 0; i < 150; ++i) {
-		text += "G";
-	}
+//	for (int i = 0; i < 2000; ++i) {
+//		text += "G";
+//	}
 	text += "$";
-	cout << text << endl;
+	//cout << text << endl;
 
 	BurrowsWheelerTransformer transformer = BurrowsWheelerTransformer(text);
 	string bwt = transformer.Transform();
-	cout << bwt.length() << endl;
+	//cout << bwt.length() << endl;
 	cout << bwt << endl;
 
 	return 0;
