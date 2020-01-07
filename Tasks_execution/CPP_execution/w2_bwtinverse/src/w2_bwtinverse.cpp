@@ -62,13 +62,15 @@ private:
 };
 
 string InverseBWT(const string& bwt) {
-	vector<string> encoded;
-	map<string, int> sorted;
+	const int codeFullLength = 6;
+
+	vector<string> encoded; // symbol of BWT + its #
+	map<string, int> sorted; // key: encoded BWT, value: index of sorted keys
 
 	for (int i = 0; i < bwt.length(); ++i) {
 		char current = bwt[i];
-		string code = to_string( i );
-		code = string(6 - code.length(), '0') + code;
+		string code = to_string(i);
+		code = string(codeFullLength - code.length(), '0') + code;
 		encoded.push_back( current + code );
 	}
 
