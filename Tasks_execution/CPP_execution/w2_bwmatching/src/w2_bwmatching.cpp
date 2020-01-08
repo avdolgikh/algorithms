@@ -8,14 +8,14 @@
 
 using namespace std;
 
-void PrintCounts(const vector<char>& symbols, int length, const map<char, vector<int>>& occ_count_before) {
-	for (auto& symbol : symbols) {
-		cout << symbol << "   ";
+void PrintCounts(const map<char, int>& symbolCounts, int length, const map<char, vector<int>>& occ_count_before) {
+	for (auto& symbol : symbolCounts) {
+		cout << symbol.first << "   ";
 	}
 	cout << endl;
 	for (int i = 0; i < length; ++i) {
-		for (auto& symbol : symbols) {
-			cout << occ_count_before.at(symbol)[i] << "   ";
+		for (auto& symbol : symbolCounts) {
+			cout << occ_count_before.at(symbol.first)[i] << "   ";
 		}
 		cout << endl;
 	}
@@ -33,34 +33,26 @@ void PreprocessBWT(const string& bwt,
                    map<char, int>& starts,
                    map<char, vector<int> >& occ_count_before) {
 	map<char, int> symbolCounts;
-	vector<char> symbols;
 
 	for (size_t i = 0; i < bwt.length(); ++i) {
 		symbolCounts[bwt[i]]++;
 
 		if (occ_count_before[bwt[i]].empty()) {
-			vector<int> zeros(bwt.length(), 0);
-			occ_count_before[bwt[i]] = zeros;
+			occ_count_before[bwt[i]].assign(bwt.length(), 0);
 		}
 
-		for (auto const& symbol : symbolCounts) {
-			occ_count_before[symbol.first][i] = symbolCounts[symbol.first];
-		}
+		vector<int> tailCounts(bwt.length() - i, symbolCounts[bwt[i]]);
+		copy( begin(tailCounts), end(tailCounts), begin(occ_count_before[bwt[i]]) + i);
 	}
-
-	for (auto const& symbol : symbolCounts) {
-		symbols.push_back(symbol.first);
-	}
-
-	PrintCounts(symbols, (int) bwt.length(), occ_count_before);
 
 	int firstColumnIndex = 0;
-	for (auto& symbol : symbols) {
-		//cout << counts[symbol] << endl;
-		starts[symbol] = firstColumnIndex;
-		firstColumnIndex += symbolCounts[symbol];
-		cout << "starts[" << symbol << "]: " << starts[symbol] << endl;
+	for (auto& symbolCount : symbolCounts) {
+		starts[symbolCount.first] = firstColumnIndex;
+		firstColumnIndex += symbolCount.second;
+		//cout << "starts[" << symbolCount.first << "]: " << starts[symbolCount.first] << endl;
 	}
+
+	//PrintCounts(symbolCounts, (int) bwt.length(), occ_count_before);
 }
 
 // Compute the number of occurrences of string pattern in the text
@@ -77,20 +69,16 @@ int CountOccurrences(const string& pattern,
 	  if (symbolIndex >= 0) {
 		  char symbol = pattern[symbolIndex];
 		  --symbolIndex;
-		  cout << "pattern symbol: " << symbol << endl;
+		  //cout << "pattern symbol: " << symbol << endl;
 		  bool contains = false;
 		  for (int i = top; i <= bottom; ++i) {
-			  //cout << "i: " << i << ", bwt[i]: " << bwt[i] << endl;
 			  if (symbol == bwt[i]) {
-				  //cout << "starts.at(symbol): " << starts.at(symbol) << endl;
-				  //cout << "occ_count_before.at(symbol)[top]: " << occ_count_before.at(symbol)[top] << endl;
-				  //cout <<  "occ_count_before.at(symbol)[bottom]: " << occ_count_before.at(symbol)[bottom] << endl;
 				  int topCount = occ_count_before.at(symbol)[top] > 0 ? occ_count_before.at(symbol)[top] - 1 : 0;
 				  int bottomCount = occ_count_before.at(symbol)[bottom] > 0 ? occ_count_before.at(symbol)[bottom] - 1 : 0;
 				  top = starts.at(symbol) + topCount;
 				  bottom = starts.at(symbol) + bottomCount;
-				  cout << "top: " << top << endl;
-				  cout << "bottom: " << bottom << endl;
+				  //cout << "top: " << top << endl;
+				  //cout << "bottom: " << bottom << endl;
 				  contains = true;
 				  break;
 			  }
@@ -107,10 +95,10 @@ int CountOccurrences(const string& pattern,
 
 
 int main() {
-  string bwt = "AGGGAA$";
-  //cin >> bwt;
-  int pattern_count = 1;
-  //cin >> pattern_count;
+  string bwt; // = "smnpbnnaaaaa$a";
+  cin >> bwt;
+  int pattern_count;
+  cin >> pattern_count;
 
   // Start of each character in the sorted list of characters of bwt,
   // see the description in the comment about function PreprocessBWT
@@ -127,8 +115,8 @@ int main() {
   PreprocessBWT(bwt, starts, occ_count_before);
 
   for (int pi = 0; pi < pattern_count; ++pi) {
-    string pattern = "GA";
-    //cin >> pattern;
+    string pattern; // = "ana";
+    cin >> pattern;
     int occ_count = CountOccurrences(pattern, bwt, starts, occ_count_before);
     printf("%d ", occ_count);
   }
