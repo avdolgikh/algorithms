@@ -1,3 +1,5 @@
+# https://www.educative.io/module/page/8q5JgjuzjGkprAwQG/10370001/4896118288416768/6183383740448768
+
 from typing import Optional
 
 class LinkedListNode:
