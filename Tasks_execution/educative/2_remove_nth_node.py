@@ -1,42 +1,6 @@
 # https://www.educative.io/module/page/8q5JgjuzjGkprAwQG/10370001/4896118288416768/6183383740448768
 
-from typing import Optional
-
-class LinkedListNode:
-    def __init__(
-        self,
-        value: int,
-        next: Optional["LinkedListNode"] = None,
-    ):
-        self._value = value
-        self.next = next
-
-    def __repr__(self) -> str:
-        return f"{self._value}"
-
-
-class LinkedList:
-    def __init__(self):
-        self.head: Optional[LinkedListNode] = None
-
-    def append(self, value: int) -> None:
-        new_node = LinkedListNode(value)
-        if not self.head:
-            self.head = new_node
-        else:
-            current = self.head
-            while current.next:
-                current = current.next
-            current.next = new_node
-
-    def __repr__(self) -> str:
-        values = []
-        current = self.head
-        while current:
-            values.append(repr(current))
-            current = current.next
-        return " -> ".join(values)
-
+from linked_list import LinkedListNode, LinkedList, from_list
 
 
 def remove_nth_last_node(
@@ -60,11 +24,6 @@ def remove_nth_last_node(
 
     return wrapper_list.next
 
-def from_list(list_: list) -> LinkedList:
-    linked_list = LinkedList()
-    for value in list_:
-        linked_list.append(value)
-    return linked_list
 
 
 if __name__ == "__main__":
