@@ -3,24 +3,53 @@
 from binary_tree import TreeNode
 
 
-def diameter_of_binaryTree(root):
-    def dfs(node):
-        """Returns the height of the current node and updates the diameter."""
-        if not node:
-            return 0  # Base case: Height of a null node is 0
+# def diameter_of_binaryTree(root):
+#     def dfs(node):
+#         """Returns the height of the current node and updates the diameter."""
+#         if not node:
+#             return 0  # Base case: Height of a null node is 0
         
-        left_height = dfs(node.left)  # Height of the left subtree
-        right_height = dfs(node.right)  # Height of the right subtree
+#         left_height = dfs(node.left)  # Height of the left subtree
+#         right_height = dfs(node.right)  # Height of the right subtree
         
-        # Update the diameter (path through this node)
-        nonlocal diameter
-        diameter = max(diameter, left_height + right_height)
+#         # Update the diameter (path through this node)
+#         nonlocal diameter
+#         diameter = max(diameter, left_height + right_height)
         
-        # Return the height of this node
-        return max(left_height, right_height) + 1
+#         # Return the height of this node
+#         return max(left_height, right_height) + 1
 
+#     diameter = 0
+#     dfs(root)
+#     return diameter
+
+
+def diameter_of_binaryTree(root):
+    if not root:
+        return 0
+
+    stack = [(root, False)]  # (node, visited flag)
+    heights = {}  # Store heights of nodes
     diameter = 0
-    dfs(root)
+
+    while stack:
+        node, visited = stack.pop()
+
+        if not node:
+            continue
+
+        if visited:
+            # Calculate height and update diameter
+            left_height = heights.get(node.left, 0)
+            right_height = heights.get(node.right, 0)
+            diameter = max(diameter, left_height + right_height)
+            heights[node] = max(left_height, right_height) + 1
+        else:
+            # Postorder traversal: Push node twice
+            stack.append((node, True))  # Push back for processing
+            stack.append((node.right, False))  # Right child
+            stack.append((node.left, False))  # Left child
+
     return diameter
 
 
