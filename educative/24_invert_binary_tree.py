@@ -3,6 +3,7 @@
 from binary_tree import TreeNode
 
 
+# Preorder DFS
 def mirror_binary_tree(root):
     if root:
         stack = [root]

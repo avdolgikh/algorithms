@@ -2,7 +2,7 @@
 
 from binary_tree import TreeNode
 
-
+# # Postoprder DFS
 # def diameter_of_binaryTree(root):
 #     def dfs(node):
 #         """Returns the height of the current node and updates the diameter."""
@@ -24,6 +24,7 @@ from binary_tree import TreeNode
 #     return diameter
 
 
+# Postoprder DFS
 def diameter_of_binaryTree(root):
     if not root:
         return 0
